@@ -1,0 +1,27 @@
+{% include 'nav.html' %}
+<h2>🛡️ Campaign Progress</h2>
+
+{% if progress %}
+  <table border="1" cellpadding="6" cellspacing="0">
+    <tr>
+      <th>Challenge</th>
+      <th>Description</th>
+      <th>Difficulty</th>
+      <th>Status</th>
+      <th>Hint</th>
+      <th>⭐ Stars</th>
+    </tr>
+    {% for name, desc, diff, status, hint, stars in progress %}
+    <tr>
+      <td>{{ name }}</td>
+      <td>{{ desc }}</td>
+      <td>{{ diff }}</td>
+      <td>{{ status }}</td>
+      <td>{{ hint }}</td>
+      <td>{{ stars }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% else %}
+  <p>No challenges found. Make sure the database is initialized.</p>
+{% endif %}
