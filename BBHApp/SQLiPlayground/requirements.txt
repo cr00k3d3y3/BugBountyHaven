@@ -1,5 +1,0 @@
-flask
-pymysql
-PyJWT
-cryptography
-
