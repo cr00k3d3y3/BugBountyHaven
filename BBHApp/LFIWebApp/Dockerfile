@@ -1,5 +1,22 @@
-FROM php:7.4-apache
+# Use official Python image
+FROM python:3.11-slim
 
-COPY . /var/www/html/
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-RUN chmod -R 777 /var/www/html/uploads
+# Set work directory
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . /app/
+
+# Expose Flask port
+EXPOSE 80
+
+# Run the Flask app
+CMD ["python", "app.py"]

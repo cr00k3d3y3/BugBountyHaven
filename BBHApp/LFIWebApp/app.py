@@ -1,15 +1,18 @@
-from flask import Flask, request, render_template, redirect, url_for, g
+from flask import Flask, request, render_template, send_file, redirect, url_for, g, make_response
+import os
 import sqlite3
-from markupsafe import Markup
+from datetime import datetime
 from pathlib import Path
 
 app = Flask(__name__)
 app.secret_key = 'ultrasecret'
 DATABASE = 'data.db'
+UPLOAD_FOLDER = 'uploads'
 
-# Auto-init DB
+# Ensure uploads directory exists
+Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
 
-# DB and logger
+# DB Setup
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -17,62 +20,112 @@ def get_db():
         db = g._database = sqlite3.connect(DATABASE)
     return db
 
-def log_attempt(endpoint, ip, payload):
-    db = get_db()
-    db.execute("INSERT INTO logs (endpoint, ip, payload) VALUES (?, ?, ?)", (endpoint, ip, payload))
-    db.commit()
-
 @app.teardown_appcontext
 def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
 
-@app.route('/')
-def home():
+# Logging for commands/flag triggers
+
+def log_attempt(endpoint, ip, payload):
+    db = get_db()
+    db.execute("INSERT INTO logs (endpoint, ip, payload) VALUES (?, ?, ?)", (endpoint, ip, payload))
+    db.commit()
+
+# Routes
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return "❌ No file uploaded"
+        file = request.files['file']
+        filename = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(filename)
+        return f"✅ Uploaded to: {filename}"
     return render_template('home.html')
 
-@app.route('/reflected')
-def reflected():
-    msg = request.args.get("msg", "")
-    output = Markup(msg)
-    flag = ''
-    hint = 'Try ?msg=<script>alert(1)</script>'
-    if "<script" in msg.lower():
-        flag = '🎉 FLAG{reflected_xss_triggered}'
-    return render_template("reflected.html", msg=output, hint=hint, flag=flag)
+@app.route('/upload', methods=['POST'])
+def upload():
+    if 'file' not in request.files:
+        return "❌ No file uploaded"
+    file = request.files['file']
+    filename = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filename)
+    return f"✅ Uploaded to: {filename}"
 
-@app.route('/stored', methods=['GET', 'POST'])
-def stored():
-    messages = []
-    username = request.cookies.get('auth') or 'anonymous'
-    hint = 'Try <script>fetch("/steal?flag=FLAG")</script>'
-    flag = ''
-    db = get_db()
-    cur = db.cursor()
-    if request.method == 'POST':
-        val = request.form['msg']
-        messages.append(Markup(val))
-        log_attempt('/stored', request.remote_addr, val)
-        if "<script" in val.lower():
-            cur.execute("SELECT * FROM submissions WHERE flag_value = ? AND username = ?", ('FLAG{stored_xss_executed}', username))
+@app.route('/view')
+def view():
+    page = request.args.get('page', '')
+    if '..' in page or page.startswith('/') or page.startswith('\\'):
+        return "❌ Invalid path"
+
+    path = os.path.join(UPLOAD_FOLDER, page)
+    if not os.path.exists(path):
+        return "❌ File not found"
+
+    if path.endswith('.txt'):
+        return open(path).read()
+    elif path.endswith('.php') and 'shell' in page:
+        # Trigger flag for LFI Shell
+        user = request.cookies.get('auth') or 'anonymous'
+        db = get_db()
+        cur = db.cursor()
+        flag = 'FLAG{lfi_shell_triggered}'
+        cur.execute("SELECT * FROM submissions WHERE flag_value = ? AND username = ?", (flag, user))
+        if not cur.fetchone():
+            cur.execute("INSERT INTO submissions (username, flag_value, challenge_name, stars) VALUES (?, ?, ?, ?)",
+                        (user, flag, 'LFI - Shell Trigger', 1))
+            db.commit()
+        log_attempt('/view', request.remote_addr, f'LFI shell by {user}')
+        return f"💣 Simulated shell execution for user: {user} — FLAG submitted"
+    else:
+        return f"📄 File included: {path}"
+
+@app.route('/shell')
+def shell():
+    cmd = request.args.get('cmd', '')
+    log_path = os.path.join('uploads', 'shell_logs.txt')
+    os.makedirs('uploads', exist_ok=True)
+
+    if cmd:
+        with open(log_path, 'a') as log_file:
+            log_file.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} | {cmd}\n")
+
+        result = os.popen(cmd).read()
+
+        # Trigger flag if command is successful (simulating reverse shell)
+        if 'whoami' in cmd or 'id' in cmd:
+            username = request.cookies.get('auth') or 'anonymous'
+            flag_value = 'FLAG{reverse_shell_triggered}'
+            cur = get_db().cursor()
+            cur.execute("SELECT * FROM submissions WHERE username = ? AND flag_value = ?", (username, flag_value))
             if not cur.fetchone():
                 cur.execute("INSERT INTO submissions (username, flag_value, challenge_name) VALUES (?, ?, ?)",
-                            (username, 'FLAG{stored_xss_executed}', 'Stored XSS'))
-                db.commit()
-        return redirect(url_for('stored'))
-    cur.execute("SELECT * FROM submissions WHERE flag_value = ? AND username = ?", ('FLAG{stored_xss_executed}', username))
-    if cur.fetchone():
-        flag = '🎉 FLAG{stored_xss_executed}'
-    return render_template("stored.html", messages=messages, hint=hint, flag=flag)
+                            (username, flag_value, 'LFI Reverse Shell'))
+                get_db().commit()
+            result += f"\n\n🎉 {flag_value}"
 
-@app.route('/dom')
-def dom():
-    return render_template("dom.html")
+        return f"<pre>{result}</pre>"
 
-@app.route('/steal')
-def steal():
-    flag = request.args.get('flag')
-    print(f"🔥 Exfiltrated: {flag}")
-    log_attempt('/steal', request.remote_addr, flag or 'EMPTY')
-    return '', 204
+    return '''
+        <h3>💣 Trigger Shell</h3>
+        <form method="get">
+            <input name="cmd" placeholder="Enter command">
+            <input type="submit" value="Execute">
+        </form>
+    '''
+
+@app.route('/shell_logs')
+def shell_logs():
+    try:
+        with open('uploads/shell_logs.txt') as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = ''
+    return render_template("shell_logs.html", logs=content)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=80)
