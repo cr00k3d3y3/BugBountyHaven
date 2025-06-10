@@ -1,0 +1,15 @@
+{% include 'nav.html' %}
+<h2>🐚 LFI Playground</h2>
+
+<form action="/upload" method="POST" enctype="multipart/form-data">
+  <input type="file" name="file">
+  <input type="submit" value="Upload File">
+</form>
+
+<hr>
+
+<h3>🔍 Simulate File Inclusion</h3>
+<form method="GET" action="/view">
+  <input name="page" placeholder="e.g., shell.php">
+  <input type="submit" value="Include">
+</form>
