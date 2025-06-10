@@ -24,7 +24,7 @@ Built to simulate authentic attack surfaces with training wheels, this lab is id
 ## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/yourusername/bug-bounty-haven.git
+git clone https://[github.com/yourusername/bug-bounty-haven.git](https://github.com/cr00k3d3y3/BugBountyHaven)
 cd bug-bounty-haven
 docker-compose up --build
 ```
