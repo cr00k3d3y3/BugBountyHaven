@@ -1,0 +1,13 @@
+{% include 'nav.html' %}
+<h2>Moderation Review Log</h2>
+<table border="1">
+  <tr><th>ID</th><th>Action</th><th>Comment</th><th>Time</th></tr>
+  {% for id, action, comment, ts in rows %}
+  <tr>
+    <td>{{ id }}</td>
+    <td>{{ action }}</td>
+    <td>{{ comment }}</td>
+    <td>{{ ts }}</td>
+  </tr>
+  {% endfor %}
+</table>
