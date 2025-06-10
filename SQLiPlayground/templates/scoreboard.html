@@ -1,0 +1,15 @@
+{% include 'nav.html' %}
+<h2>🏆 Scoreboard</h2>
+{% if request.cookies.get('role') == 'admin' %}
+  <form method="post" action="/reset_scoreboard">
+    <button type="submit">🧹 Reset Scoreboard</button>
+  </form>
+{% endif %}
+
+
+<table border="1">
+  <tr><th>User</th><th>Challenge</th><th>Timestamp</th></tr>
+  {% for user, challenge, timestamp in rows %}
+  <tr><td>{{ user }}</td><td>{{ challenge }}</td><td>{{ timestamp }}</td></tr>
+  {% endfor %}
+</table>
