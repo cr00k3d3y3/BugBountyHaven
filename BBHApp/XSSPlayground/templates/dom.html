@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>XSS Playground</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #10141c;
+      color: #f1f1f1;
+      text-align: center;
+      padding-top: 60px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: inline-block;
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 12px 20px;
+      margin: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.1em;
+    }
+    .btn:hover {
+      background: #374151;
+    }
+  </style>
+</head>
+<body>
+  <h1>💉 XSS Playground</h1>
+  <a class="btn" href="/reflected">Reflected XSS</a>
+  <a class="btn" href="/stored">Stored XSS</a>
+  <a class="btn" href="/dom">DOM XSS</a>
+  <a class="btn" href="http://localhost:8081/submit_flag">Submit Flag</a>
+  <a class="btn" href="http://localhost:8081/scoreboard">🏆 Scoreboard</a>
+  <a class="btn" href="http://localhost:8081/campaign">🎯 Campaign</a>
+  <a class="btn" href="http://localhost:8080">⬅️ Main Menu</a>
+</body>
+</html>
+
+<h2>🔎 DOM-Based XSS Challenge</h2>
+<p>Target: Rendered content from <code>window.location.hash</code> into the DOM unsafely.</p>
+
+<div id="output" style="padding: 10px; border: 1px solid #888;"></div>
+
+<div id="flagBanner" style="display: none; margin-top: 20px; padding: 15px; background-color: #dff0d8; border-left: 5px solid #4CAF50;">
+  🎉 <strong>FLAG{dom_xss_triggered}</strong><br>
+  Congratulations! You successfully exploited the DOM-based XSS vulnerability.
+</div>
+
+<script>
+  // Simulate app-stored JWT (would normally be set on login)
+  localStorage.setItem('jwt', 'admin.jwt.token');
+
+  const hashPayload = decodeURIComponent(location.hash.substring(1));
+  document.getElementById('output').innerHTML = hashPayload;
+
+  if (hashPayload.includes("<script")) {
+    const stolen = localStorage.getItem('jwt');
+    fetch('/steal?flag=FLAG{dom_xss_triggered}&jwt=' + stolen).then(() => {
+      document.getElementById('flagBanner').style.display = 'block';
+    });
+  }
+</script>
+
+
+
+
+<p><strong>Try:</strong> <code>/dom#&lt;script&gt;alert(1)&lt;/script&gt;</code></p>

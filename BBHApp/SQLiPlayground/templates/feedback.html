@@ -1,0 +1,39 @@
+{% include 'nav.html' %}
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #10141c;
+      color: #f1f1f1;
+      text-align: center;
+      padding-top: 60px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: inline-block;
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 12px 20px;
+      margin: 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.1em;
+    }
+    .btn:hover {
+      background: #374151;
+    }
+  </style>
+<h2>Submit Feedback</h2>
+<form method="post">
+  <input name="comment" placeholder="Your feedback">
+  <input type="submit" value="Submit">
+</form>
+
+<h3>Previous Feedback</h3>
+<ul>
+  {% for id, comment in rows %}
+  <li><strong>#{{ id }}</strong>: {{ comment }}</li>
+  {% endfor %}
+</ul>
