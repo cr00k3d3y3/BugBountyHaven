@@ -1,0 +1,16 @@
+{% include 'index.html' %}
+</head>
+<body>
+  <h1>🏆 Scoreboard</h1>
+
+  <table>
+    <tr><th>User</th><th>Challenge</th><th>Timestamp</th></tr>
+    {% for user, challenge, timestamp in rows %}
+    <tr><td>{{ user }}</td><td>{{ challenge }}</td><td>{{ timestamp }}</td></tr>
+    {% endfor %}
+  </table>
+
+  <a class="btn" href="/home">🏠 Home</a>
+  <a class="btn" href="http://localhost:8080">⬅️ Main Menu</a>
+</body>
+</html>
