@@ -1,4 +1,0 @@
-flask
-markupsafe
-pyjwt
-cryptography
