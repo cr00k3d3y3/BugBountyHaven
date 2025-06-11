@@ -1,9 +1,0 @@
-{% include 'nav.html' %}
-<h2>🔍 Reflected XSS</h2>
-<form method="get">
-  <input name="msg" placeholder="Try injecting HTML/JS">
-  <input type="submit">
-</form>
-<p><strong>Result:</strong> {{ msg }}</p>
-{% if flag %}<p style="color: green;">{{ flag }}</p>{% endif %}
-<p><em>Hint:</em> {{ hint }}</p>
