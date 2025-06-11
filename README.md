@@ -31,9 +31,7 @@ docker-compose up --build
 
 Then navigate to:
 
-* SQLi Playground → [http://localhost:8081](http://localhost:8081)
-* XSS Playground → [http://localhost:8082/stored](http://localhost:8082/stored)
-* LFI Playground → [http://localhost:8083](http://localhost:8083)
+[http://localhost:8080/](http://localhost:8080)
 
 ---
 
