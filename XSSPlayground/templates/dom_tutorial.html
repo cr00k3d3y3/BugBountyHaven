@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DOM XSS Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre, code {
+      background: #222;
+      color: #0ff;
+      padding: 0.5rem;
+      border-radius: 5px;
+      display: block;
+      overflow-x: auto;
+    }
+    a {
+      color: #0ff;
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+    hr {
+      margin: 2rem 0;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>DOM XSS Tutorial</h1>
+
+  <section>
+    <h2>🧠 What is DOM XSS?</h2>
+    <p>DOM-based Cross-Site Scripting occurs when the JavaScript code in a page dynamically writes untrusted input into the DOM without proper sanitization. The vulnerability is entirely client-side, meaning it does not touch the server.</p>
+  </section>
+
+  <section>
+    <h2>🧨 Why It Matters</h2>
+    <ul>
+      <li>Occurs in JS-heavy frontends like React, Angular, or vanilla JS.</li>
+      <li>Bypasses server logs and WAFs.</li>
+      <li>Often missed by traditional input/output validation layers.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🛠️ Code Behavior</h2>
+    <p>Example JS in page:</p>
+    <pre>document.getElementById('output').innerHTML = location.hash.substring(1);</pre>
+    <p>This directly injects whatever is in the URL hash into the DOM.</p>
+  </section>
+
+  <section>
+    <h2>🔍 How to Trigger</h2>
+    <p>Visit the page with a payload like:</p>
+    <pre>/dom#&lt;script&gt;alert(1)&lt;/script&gt;</pre>
+    <p>If the script executes, the page is vulnerable.</p>
+  </section>
+
+  <section>
+    <h2>⚠️ Common Misconceptions</h2>
+    <p>Not all inputs reach the DOM. To exploit DOM XSS, the page must:</p>
+    <ul>
+      <li>Read from <code>location.hash</code>, <code>location.search</code>, or user-controlled JS variables</li>
+      <li>Write to <code>innerHTML</code>, <code>document.write()</code>, or <code>eval()</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🕵️ Reporting Example</h2>
+    <pre>
+**Title**: DOM XSS in client-side hash parser
+**Impact**: Arbitrary JS execution in user’s browser.
+**Steps to Reproduce**:
+1. Navigate to /dom#<script>alert(1)</script>
+2. Alert box is triggered.
+**Remediation**: Sanitize hash inputs or use `textContent` instead of `innerHTML`.
+    </pre>
+  </section>
+
+  <section>
+    <h2>📚 Resources</h2>
+    <ul>
+      <li><a href="https://owasp.org/www-community/attacks/DOM_Based_XSS">OWASP DOM XSS Guide</a></li>
+      <li><a href="https://portswigger.net/web-security/dom-based">PortSwigger DOM XSS</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Location/hash">MDN - location.hash</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🏁 Flag</h2>
+    <pre>🎉 FLAG{xss_dom_executed}</pre>
+    <p>Look for how the DOM renders the payload. Understand JavaScript behavior. Master the client-side.</p>
+  </section>
+   <p>
+  <a href="/reflected">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

@@ -1,6 +1,6 @@
 {% include 'index.html' %}
 
-<h2>Stacked Queries</h2>
+<h2>📚 Stacked SQL Injection</h2>
 <form method="post">
   <textarea name="sql" placeholder="Enter raw SQL..." rows="4" cols="60"></textarea><br>
   <input type="submit" value="Execute">
@@ -9,7 +9,7 @@
 {% for r in result %}<li>{{ r }}</li>{% endfor %}
 </ul>
 <p style="color: green;">{{ flag }}</p>
-<p style="color: blue;">Hint: {{ hint }}</p>
+<p style="color: rgb(240, 240, 243);">Hint: {{ hint }} to modify DB state. Watch for multiple command execution!</p>
 
-<h2>📚 Stacked SQL Injection</h2>
-<p>Use stacked queries like <code>'; UPDATE users SET role='admin';--</code> to modify DB state. Watch for multiple command execution!</p>
+
+ 

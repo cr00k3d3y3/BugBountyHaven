@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stored XSS Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre, code {
+      background: #222;
+      color: #0ff;
+      padding: 0.5rem;
+      border-radius: 5px;
+      display: block;
+      overflow-x: auto;
+    }
+    a {
+      color: #0ff;
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+    hr {
+      margin: 2rem 0;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Stored XSS Tutorial</h1>
+
+  <section>
+    <h2>🧠 What is Stored XSS?</h2>
+    <p>Stored Cross-Site Scripting (also known as persistent XSS) occurs when an attacker injects malicious JavaScript into a website's database, and that script is served to other users later.</p>
+  </section>
+
+  <section>
+    <h2>🧨 Why It Matters</h2>
+    <ul>
+      <li>The payload persists in storage (DB, logs, file).</li>
+      <li>Every viewer of the infected content is vulnerable.</li>
+      <li>Often appears in forums, comments, profile fields.</li>
+      <li>Can hijack sessions, deface pages, or phish users.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🛠️ Server-Side Behavior</h2>
+    <ol>
+      <li>Input from form field (e.g., comment) is submitted.</li>
+      <li>Backend stores it in a database without sanitization.</li>
+      <li>When rendered, JavaScript executes in user browser.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>👁️ Client-Side Clues</h2>
+    <ul>
+      <li>Script executes on page load.</li>
+      <li>Common payload: <code>&lt;script&gt;alert(1)&lt;/script&gt;</code></li>
+      <li>More evasive payloads include encoded or obfuscated scripts.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>⚠️ Common Misconceptions</h2>
+    <h3>❌ Attempted Payload:</h3>
+    <pre>&lt;script&gt;alert(1)&lt;/script&gt;</pre>
+    <p>This does NOT work because it’s HTML-escaped by the server.</p>
+
+    <h3>✅ Working Payload:</h3>
+    <pre>&lt;script&gt;alert(1)&lt;/script&gt;</pre>
+    <p>This works because it’s interpreted as executable JavaScript.</p>
+  </section>
+
+  <section>
+    <h2>🧪 Example Input Flow:</h2>
+    <ol>
+      <li>Type: <code>&lt;script&gt;alert('xss')&lt;/script&gt;</code></li>
+      <li>Submit.</li>
+      <li>Visit the stored message display page.</li>
+      <li>Observe alert.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>🕵️ Reporting Example</h2>
+    <pre>
+**Title**: Stored XSS in Comment Submission Form
+**Impact**: Allows attacker to execute arbitrary JS in any viewer’s session.
+**Steps to Reproduce**:
+1. Go to /stored.
+2. Submit payload: <script>alert(document.cookie)</script>
+3. Reload the page.
+4. Alert box triggers.
+
+**Remediation**: Sanitize input or encode output.
+    </pre>
+  </section>
+
+  <section>
+    <h2>📚 Resources</h2>
+    <ul>
+      <li><a href="https://owasp.org/www-community/attacks/xss/">OWASP XSS Guide</a></li>
+      <li><a href="https://portswigger.net/web-security/cross-site-scripting">PortSwigger Labs</a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Glossary/Cross-site_scripting">Mozilla XSS Docs</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>🏁 Flag</h2>
+    <pre>🎉 FLAG{stored_xss_executed}</pre>
+    <p>Try a payload. Observe its behavior. Learn why it works — or doesn’t. That’s how bug bounty pros evolve.</p>
+  </section>
+
+  <p>
+  <a href="/stored">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

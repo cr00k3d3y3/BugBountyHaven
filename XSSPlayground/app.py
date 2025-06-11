@@ -58,6 +58,9 @@ def reflected():
         flag = '🎉 FLAG{reflected_xss_triggered}'
     return render_template("reflected.html", msg=output, hint=hint, flag=flag)
 
+@app.route('/reflected_tutorial')
+def reflected_tutorial():
+    return render_template('reflected_tutorial.html')
 
 @app.route('/stored', methods=['GET', 'POST'])
 def stored():
@@ -84,6 +87,11 @@ def stored():
         flag = '🎉 FLAG{stored_xss_executed}'
     return render_template("stored.html", messages=messages, hint=hint, flag=flag)
 
+@app.route('/stored_tutorial')
+def stored_tutorial():
+    return render_template('stored_tutorial.html')
+
+
 @app.route('/dom')
 def dom():
     username = request.cookies.get('auth') or 'anonymous'
@@ -98,6 +106,10 @@ def dom():
         db.commit()
         flag = '🎉 FLAG{dom_xss_triggered}'
     return render_template("dom.html", flag=flag)
+
+@app.route('/dom_tutorial')
+def dom_tutorial():
+    return render_template('dom_tutorial.html')
 
 @app.route('/steal')
 def steal():

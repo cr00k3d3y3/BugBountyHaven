@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflected XSS Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      padding: 2rem;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    code {
+      background: #222;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow: auto;
+    }
+    .note {
+      background: #222;
+      border-left: 4px solid #0ff;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    a {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>💉 Reflected XSS Tutorial</h1>
+  <h2>🔍 What is Reflected XSS?</h2>
+  <p>
+    Reflected Cross-Site Scripting (XSS) occurs when unsanitized input is immediately echoed back to the browser in a page’s response. It's commonly found in error messages, search results, and query parameters.
+  </p>
+
+  <h2>🔬 How Does It Work?</h2>
+  <p>
+    Suppose the application reflects the value of <code>?msg=</code> into the HTML response without proper encoding:
+  </p>
+  <pre><code>http://localhost:8082/reflected?msg=&lt;script&gt;alert(1)&lt;/script&gt;</code></pre>
+  <p>
+    This payload will trigger an alert box if the input is injected unsafely into the DOM.
+  </p>
+
+  <h2>❌ Bad Payloads (Why They Fail)</h2>
+  <pre><code>&lt;scrpt&gt;alert(1)&lt;/scrpt&gt;  # Typo in tag
+alert(1)                   # Missing script tags
+&lt;script&gt;alert(1)           # Unclosed tag</code></pre>
+
+  <h2>✅ Working Payload</h2>
+  <pre><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></pre>
+  <p>
+    This works because the browser parses it as JavaScript when reflected.
+  </p>
+
+  <div class="note">
+    <strong>Real World:</strong> Attackers may inject malicious scripts that steal cookies, session tokens, or redirect users to phishing pages.
+  </div>
+
+  <h2>📜 Reporting Example</h2>
+  <p>
+    <strong>Title:</strong> Reflected XSS in <code>/reflected</code> parameter<br>
+    <strong>Severity:</strong> High<br>
+    <strong>Steps to Reproduce:</strong>
+  </p>
+  <ol>
+    <li>Go to <code>http://target.com/reflected?msg=&lt;script&gt;alert(1)&lt;/script&gt;</code></li>
+    <li>Observe alert popup</li>
+  </ol>
+
+  <p>
+    <strong>Recommendation:</strong> Sanitize and encode all user inputs before rendering them in the HTML response.
+  </p>
+
+  <footer>
+    <p>Created for ethical hacking training only. Do not use on unauthorized systems.</p>
+  </footer>
+
+  <p>
+  <a href="/reflected">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

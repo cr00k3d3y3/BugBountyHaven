@@ -140,6 +140,11 @@ def union():
             result = f"❌ Error: {e}"
     return render_template('union.html', result=result, flag=flag, hint=hint)
 
+@app.route('/union_tutorial')
+def union_tutorial():
+    return render_template('union_tutorial.html')
+
+
 @app.route('/auth', methods=['GET', 'POST'])
 def auth():
     result = ''

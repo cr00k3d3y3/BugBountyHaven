@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Union SQL Injection Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    code {
+      background: #222;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    a {
+      color: #0ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<h1>📊 UNION-Based SQL Injection</h1>
+<p><strong>Objective:</strong> Exploit the SQL query using the UNION operator to extract additional data.</p>
+
+<h2>🧠 What is UNION SQLi?</h2>
+<p>The <code>UNION</code> operator lets you combine the results of two SELECT queries into a single output. In SQLi, attackers abuse this to query additional columns/tables and exfiltrate data like usernames, passwords, emails.</p>
+
+<h2>🖥️ Server-side Logic</h2>
+<pre><code>query = "SELECT id, username FROM users WHERE username = '" + input + "'"</code></pre>
+
+<h2>❌ Failing Example</h2>
+<p><strong>Payload:</strong> <code>admin'--</code></p>
+<p><strong>Why it fails:</strong> This simply bypasses authentication but doesn't show other data.</p>
+
+<h2>⚠️ Syntax Errors</h2>
+<p><strong>Payload:</strong> <code>' UNION SELECT 'a','b','c'--</code></p>
+<p><strong>Error:</strong> <code>Incorrect number of columns</code></p>
+<p>You must match the original number of columns (in this case, 2).</p>
+
+<h2>✅ Working Exploit</h2>
+<p><strong>Payload:</strong> <code>' UNION SELECT 1, email FROM users--</code></p>
+<p>This appends a new result set with all user emails.</p>
+
+<h2>📝 Bug Bounty Report Sample</h2>
+<pre>
+Title: SQL Injection via UNION SELECT in 'username' parameter
+
+Summary:
+A SQL Injection exists in the 'username' input of /union that allows UNION-based data extraction.
+
+Steps:
+1. Navigate to /union
+2. Submit payload: ' UNION SELECT 1, email FROM users--
+3. Observe leaked user data including admin@example.com
+
+Impact:
+Data breach risk. Admin email and other PII can be extracted.
+
+Recommendation:
+Use parameterized queries (e.g., SQLite3 `?` binding) and validate inputs.
+</pre>
+
+<h2>🔗 Reference</h2>
+<ul>
+  <li><a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank">OWASP SQL Injection</a></li>
+  <li><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89: SQL Injection</a></li>
+</ul>
+
+<p>
+  <a href="/union">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>
