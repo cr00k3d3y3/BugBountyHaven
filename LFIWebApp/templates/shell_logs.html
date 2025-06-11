@@ -1,0 +1,11 @@
+{% include 'index.html' %}
+
+
+
+<h2>📜 Shell Logs</h2>
+
+{% if logs %}
+  <pre>{{ logs }}</pre>
+{% else %}
+  <p>No logs available yet.</p>
+{% endif %}

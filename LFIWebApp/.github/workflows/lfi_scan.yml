@@ -1,0 +1,35 @@
+
+name: LFI Testing Pipeline
+
+on:
+  push:
+    paths:
+      - '**.py'
+      - '**.sh'
+      - 'lfi_payloads.txt'
+      - '.github/workflows/lfi_scan.yml'
+  schedule:
+    - cron: '0 3 * * *'  # Daily at 03:00 UTC
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install httpie ffuf -y
+          pip install requests
+
+      - name: Run LFI Pipeline
+        run: |
+          chmod +x *.sh
+          ./lfi_pipeline.sh

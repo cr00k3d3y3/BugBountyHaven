@@ -1,0 +1,7 @@
+{% include 'index.html' %}
+
+<h2>🔐 JWT Key Confusion Attack</h2>
+<p>Public Key (PEM):</p>
+<pre><code>{{ pubkey }}</code></pre>
+<p>Generate an HS256 token using this key to impersonate <code>admin</code>.</p>
+<p>Then visit <a href="/jwt_rs_admin">/jwt_rs_admin</a> with your token set as a cookie.</p>
