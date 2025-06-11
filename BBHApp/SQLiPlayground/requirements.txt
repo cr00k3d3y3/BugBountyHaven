@@ -1,0 +1,5 @@
+flask
+pymysql
+PyJWT
+cryptography
+markupsafe
