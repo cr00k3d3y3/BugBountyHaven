@@ -128,6 +128,14 @@ def shell():
             <input type="submit" value="Execute">
         </form>
     '''
+@app.route('/reverse_shell_tutorial')
+def reverse_shell_tutorial():
+    return render_template('reverse_shell_tutorial.html')
+
+@app.route('/shell_upload_tutorial')
+def shell_upload_tutorial():
+    return render_template('shell_upload_tutorial.html')
+
 
 @app.route('/shell_logs')
 def shell_logs():

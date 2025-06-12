@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><code>.git/config</code> Leak Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      color: #0ff;
+    }
+    pre, code {
+      background: #222;
+      padding: 0.5rem;
+      border-radius: 5px;
+      display: block;
+      overflow-x: auto;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    a {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🗃️ <code>.git/config</code> Leak</h1>
+
+  <div class="section">
+    <h2>🔍 What is .git/config?</h2>
+    <p>
+      The <code>.git/config</code> file is part of a Git repository and contains metadata like remote URLs, user details, and branch information.
+      This file should never be exposed to the public—it can reveal sensitive internal details or help attackers enumerate your repo structure.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Why It Matters</h2>
+    <ul>
+      <li>Reveals the Git repository's structure and origin URL.</li>
+      <li>May expose developer emails and usernames.</li>
+      <li>Combined with other exposed files (e.g., HEAD), it enables full repo reconstruction.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🕵️‍♀️ Discovery Technique</h2>
+    <p>Inspect <code>/robots.txt</code> for entries like:</p>
+    <pre>
+Disallow: /.git/
+    </pre>
+    <p>This suggests the presence of a public-facing <code>.git</code> directory.</p>
+  </div>
+
+  <div class="section">
+    <h2>🛠️ Exploit Example</h2>
+    <p>Visit the following path directly:</p>
+    <pre>http://target-site/.git/config</pre>
+    <p>You may see output like:</p>
+    <pre>
+[core]
+  repositoryformatversion = 0
+  filemode = true
+  bare = false
+  logallrefupdates = true
+[remote "origin"]
+  url = https://github.com/example/target-repo.git
+[user]
+  name = devadmin
+  email = admin@example.com
+    </pre>
+    <p>Notice the <strong>GitHub repo URL</strong> and <strong>developer info</strong>.</p>
+  </div>
+
+  <div class="section">
+    <h2>📝 Reporting Example</h2>
+    <pre>
+Title: Exposed <code>.git/config</code> File
+Severity: High
+
+Steps to Reproduce:
+1. Visit /<code>.git/config</code>
+2. Observe metadata including GitHub origin, user name, and email.
+
+Impact:
+An attacker can enumerate the Git repo, clone it remotely (if public), and use the origin data to discover more sensitive files.
+
+Recommendation:
+Block access to all .git paths via server configuration. Validate that /.git/* is never exposed.
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>📚 Further Reading</h2>
+    <ul>
+      <li><a href="https://www.hackingarticles.in/exploiting-git-folder/" target="_blank">Exploiting .git Folder - Hacking Articles</a></li>
+      <li><a href="https://book.hacktricks.xyz/pentesting-web/exploiting-git-repositories" target="_blank">HackTricks: Git Repository Leaks</a></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🏁 Flag</h2>
+    <pre>🎉 FLAG{git_config_leakage_detected}</pre>
+    <p>Earn this flag by visiting <code>/.git/config</code> and demonstrating comprehension of the data exposure.</p>
+  </div>
+<p>
+  <a href="/home">Challenge Menu</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

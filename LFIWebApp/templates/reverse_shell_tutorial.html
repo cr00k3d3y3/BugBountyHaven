@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LFI Reverse Shell Trigger Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre, code {
+      background: #222;
+      padding: 0.5rem;
+      border-radius: 5px;
+      display: block;
+      overflow-x: auto;
+    }
+    ul {
+      margin-bottom: 1rem;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    a {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🐚 LFI Reverse Shell Trigger</h1>
+
+  <div class="section">
+    <h2>🔍 What is LFI?</h2>
+    <p>
+      Local File Inclusion (LFI) allows an attacker to include files from the server's file system in the application’s output. If exploited correctly, it can be used to execute malicious scripts like uploaded PHP shells or access system files.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>💥 Why It’s Dangerous</h2>
+    <ul>
+      <li>Grants visibility into local server files.</li>
+      <li>Can be escalated to Remote Code Execution (RCE) if file uploads or logs can be included.</li>
+      <li>Combined with shell uploads, allows full system compromise.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>⚙️ Exploitation Flow</h2>
+    <ol>
+      <li>Upload a shell file (e.g., <code>shell.php</code>) via the upload interface.</li>
+      <li>Note the location (e.g., <code>uploads/shell.php</code>).</li>
+      <li>Trigger the inclusion using the LFI endpoint:</li>
+      <pre>
+GET /view?page=uploads/shell.php
+      </pre>
+      <li>If successful, you’ll see a simulated shell interaction.</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Valid Payload</h2>
+    <pre>
+/view?page=uploads/shell.php
+    </pre>
+    <p>This includes the uploaded file. If it’s a shell, the script executes, simulating RCE or shell access.</p>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Common Missteps</h2>
+    <ul>
+      <li>Including without knowing the full path: <code>page=shell.php</code> won’t work if stored in <code>/uploads</code>.</li>
+      <li>Uploading non-PHP files that can’t execute.</li>
+      <li>Misconfigured server that blocks inclusion of certain extensions.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>📋 Report Template</h2>
+    <pre>
+Title: LFI Shell Execution via User-Uploaded File
+Severity: High
+
+Steps to Reproduce:
+1. Upload a PHP shell via the file upload feature.
+2. Access /view?page=uploads/shell.php
+3. Observe code execution.
+
+Impact:
+Grants full shell execution on the host, may lead to full system compromise.
+
+Remediation:
+Validate and restrict user-uploaded file types and apply path sanitization to LFI endpoints.
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>🏁 Flag</h2>
+    <pre>🎉 FLAG{reverse_shell_triggered}</pre>
+    <p>This flag appears when the system logs a successful shell interaction.</p>
+  </div>
+ <p>
+  <a href="/">🏠 Home</a> |
+  <a href="/submit_flag">🚩Submit Flag</a>
+</p>
+</body>
+</html>

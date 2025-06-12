@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>.env Secrets Discovery Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      color: #0ff;
+    }
+    pre, code {
+      background: #222;
+      padding: 0.5rem;
+      border-radius: 5px;
+      display: block;
+      overflow-x: auto;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    a {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧪 .env Secrets Discovery</h1>
+
+  <div class="section">
+    <h2>🔍 What is a .env File?</h2>
+    <p>
+      A <code>.env</code> file is used to store environment-specific variables for an application,
+      such as database credentials, API keys, and secret tokens. These files are not meant to be publicly accessible.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Why This Matters</h2>
+    <ul>
+      <li>May expose credentials like <code>DB_USER</code>, <code>DB_PASS</code>, or <code>SECRET_KEY</code>.</li>
+      <li>Allows attackers to escalate privileges or impersonate services.</li>
+      <li>Commonly found due to misconfigurations or backups left exposed.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🛠️ Real-World Clue</h2>
+    <p>
+      Visiting <code>/robots.txt</code> reveals:
+    </p>
+    <pre>
+Disallow: /.env
+    </pre>
+    <p>
+      This suggests the file exists and is intentionally hidden from crawlers—but not protected from access.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>🧪 Exploiting the Exposure</h2>
+    <p>Visit the path:</p>
+    <pre>http://target-site/.env</pre>
+    <p>You might see output like:</p>
+    <pre>
+APP_ENV=production
+APP_DEBUG=false
+DB_HOST=localhost
+DB_USER=admin
+DB_PASS=supersecret
+SECRET_KEY=FLAG{env_file_exposed}
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>📝 Reporting Example</h2>
+    <pre>
+Title: Exposed .env File Revealing Application Secrets
+Severity: High
+
+Steps to Reproduce:
+1. Visit /robots.txt
+2. Note the disallowed path: /.env
+3. Navigate to /.env and observe the exposed secrets.
+
+Impact:
+An attacker can extract valid DB credentials and application secrets, enabling lateral movement or unauthorized access.
+
+Recommendation:
+Move .env outside the web root, configure server rules to deny access, and rotate exposed credentials.
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>📚 Further Reading</h2>
+    <ul>
+      <li><a href="https://owasp.org/www-community/vulnerabilities/Information_exposure_through_query_strings_in_url" target="_blank">OWASP: Information Exposure</a></li>
+      <li><a href="https://github.com/dotenv-linter/dotenv-linter" target="_blank">dotenv-linter Tool</a></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🏁 Flag</h2>
+    <pre>🎉 FLAG{env_file_exposed}</pre>
+    <p>Use this flag to validate the vulnerability. Understand why it's accessible and how to prevent it.</p>
+  </div>
+<p>
+  <a href="/home">Challenge Menu</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

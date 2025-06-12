@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>.DS_Store Discovery Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2, h3 {
+      color: #0ff;
+    }
+    pre, code {
+      background: #222;
+      padding: 0.5rem;
+      border-radius: 5px;
+      display: block;
+      overflow-x: auto;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    a {
+      color: #0ff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🗂️ .DS_Store Discovery</h1>
+
+  <div class="section">
+    <h2>🔍 What is .DS_Store?</h2>
+    <p>
+      <code>.DS_Store</code> is a macOS system file automatically created by Finder to store folder view preferences.
+      If accidentally uploaded to a web server, it can leak directory listings, including hidden or unlinked files.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Why It Matters</h2>
+    <ul>
+      <li>Exposes internal file names and structure of directories.</li>
+      <li>May reveal sensitive files like backups, configs, scripts.</li>
+      <li>Useful for attackers to enumerate entry points.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🕵️‍♀️ Discovery Method</h2>
+    <p>Look for it manually or with tools like:</p>
+    <pre>
+curl http://target-site/.DS_Store
+    </pre>
+    <p>Or use web fuzzers like <code>ffuf</code> or <code>dirsearch</code> to enumerate hidden files.</p>
+  </div>
+
+  <div class="section">
+    <h2>🔓 Exploitation Flow</h2>
+    <ol>
+      <li>Visit: <code>http://target-site/.DS_Store</code></li>
+      <li>If it downloads or renders binary content, save and parse it.</li>
+      <li>Use tools like <a href="https://github.com/lijiejie/ds_store_exp" target="_blank">ds_store_exp</a> to extract filenames:</li>
+    </ol>
+    <pre>
+python ds_store_exp.py http://target-site/.DS_Store
+    </pre>
+    <p>This can uncover files like:</p>
+    <pre>
+admin-login.php
+backup.zip
+config.old
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>📝 Reporting Example</h2>
+    <pre>
+Title: Exposed .DS_Store File
+Severity: Medium
+
+Steps to Reproduce:
+1. Access /.DS_Store
+2. Download and parse the file.
+3. Extract file names of hidden or sensitive files.
+
+Impact:
+Exposes internal file structure and names. May assist in chaining further vulnerabilities.
+
+Recommendation:
+Add `.DS_Store` to your `.gitignore`, `.dockerignore`, and block its access on the web server.
+    </pre>
+  </div>
+
+  <div class="section">
+    <h2>📚 Resources</h2>
+    <ul>
+      <li><a href="https://book.hacktricks.xyz/pentesting-web/file-inclusion#ds_store" target="_blank">HackTricks: .DS_Store Exploits</a></li>
+      <li><a href="https://github.com/lijiejie/ds_store_exp" target="_blank">DS_Store Exploit Tool</a></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>🏁 Flag</h2>
+    <pre>🎉 FLAG{ds_store_file_leak}</pre>
+    <p>Capture this flag by discovering and parsing a valid <code>.DS_Store</code> file on the target server.</p>
+  </div>
+<p>
+  <a href="/home">Challenge Menu</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

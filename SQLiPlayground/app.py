@@ -411,6 +411,10 @@ def secret_dashboard():
         get_db().commit()
     return render_template('secret.html')
 
+@app.route('/secret_tutorial')
+def secret_tutorial():
+    return render_template('secret_tutorial.html')
+
 @app.route('/.git/HEAD')
 def git_head():
     log_attempt('/.git/HEAD', request.remote_addr, 'git enum')
@@ -457,6 +461,12 @@ DB_PASS=supersecret
 SECRET_KEY=FLAG{env_file_exposed}"""
     return app.response_class(content, mimetype='text/plain')
 
+
+@app.route('/env_tutorial')
+def env_tutorial():
+    return render_template('env_tutorial.html')
+
+
 @app.route('/.git/config')
 def git_config_route():
     content = """[core]
@@ -473,6 +483,13 @@ def git_config_route():
 # FLAG{git_config_leakage_detected}
 """
     return app.response_class(content, mimetype='text/plain')
+
+
+@app.route('/git_config_tutorial')
+def git_config_tutorial():
+    return render_template('git_config_tutorial.html')
+
+
 
 @app.route('/admin-panel', methods=['GET', 'POST'])
 def admin_panel_exposed():
@@ -508,6 +525,10 @@ def backup_zip():
         </ul>
         <p><code>🎉 FLAG{backup_archive_exposed}</code></p>
     '''
+
+@app.route('/ds_store_tutorial')
+def ds_store_tutorial():
+    return render_template('ds_store_tutorial.html')
 
 # JWT: Login using HS256 (no password required)
 @app.route('/jwt_login', methods=['GET', 'POST'])
