@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  sqli_playground:
+    build: ./SQLiPlayground
+    ports:
+      - "8081:80"
+    volumes:
+      - ./SQLiPlayground:/app
+    restart: unless-stopped
+    container_name: sqli_playground
+
+  xss_playground:
+    build: ./XSSPlayground
+    ports:
+      - "8082:80"
+    volumes:
+      - ./XSSPlayground:/app
+    restart: unless-stopped
+    container_name: xss_playground
+
+  lfi_webapp:
+    build: ./LFIWebApp
+    ports:
+      - "8083:80"
+    volumes:
+      - ./LFIWebApp:/app
+    restart: unless-stopped
+    container_name: lfi_webapp
+
+  landing:
+    image: nginx:alpine
+    volumes:
+      - ./landing:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
+    container_name: bb_landing
+    restart: unless-stopped

@@ -1,0 +1,12 @@
+{% include 'index.html' %}
+
+<h2>Session Leak</h2>
+<form method="post">
+  <input name="user" placeholder="Enter username">
+  <input type="submit" value="Leak">
+</form>
+<p>{{ result }}</p>
+<p style="color: green;">{{ flag }}</p>
+<p style="color: blue;">Hint: {{ hint }}</p>
+
+<p>Use valid usernames in /leak to extract simulated SESSIONID and try accessing restricted pages like /admin using the leaked cookie.</p>
