@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blind Boolean SQLi Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🙈 Blind Boolean-Based SQL Injection</h1>
+
+<h2>🧠 What Is It?</h2>
+<p>Blind Boolean SQL Injection is a type of SQLi where no output is displayed, but you can infer true or false responses based on how the web app behaves.</p>
+
+<hr/>
+
+<h2>🔍 Example Attack Flow</h2>
+<pre><code>' AND 1=1-- </code></pre>
+<p>If this input behaves the same as valid input, it's a true response.</p>
+<pre><code>' AND 1=0-- </code></pre>
+<p>If this returns different output, it indicates a false condition — meaning your injection is working.</p>
+
+<hr/>
+
+<h2>✅ Testing Process</h2>
+<pre><code>
+1. Submit a baseline input: ' AND 1=1--
+2. Observe normal behavior.
+3. Submit a false condition: ' AND 1=0--
+4. Observe a different behavior (e.g., "No user found").
+</code></pre>
+
+<hr/>
+
+<h2>⚠️ Mistake to Avoid</h2>
+<pre><code>' OR 'a'='a</code></pre>
+<p>This might bypass auth but doesn't help confirm logic branching like boolean-based tests do.</p>
+
+<hr/>
+
+<h2>🎯 Goal</h2>
+<p>Use true/false logic to slowly extract values. This is especially helpful when:</p>
+<ul>
+  <li>There's no SQL error output</li>
+  <li>Pages render differently based on query outcome</li>
+</ul>
+
+<hr/>
+
+<h2>🏁 Flag</h2>
+<p>If the app sees a condition like:</p>
+<pre><code>' AND 1=1--</code></pre>
+<p>... and returns a valid result, it sets a flag:</p>
+<pre><code>🎉 FLAG{blind_boolean_sqli}</code></pre>
+
+<hr/>
+
+<h2>📝 Reporting Example</h2>
+<pre><code>
+Title: Boolean-Based SQL Injection in search field
+Impact: Allows data extraction through true/false logic.
+Steps:
+1. Input: ' AND 1=1--
+2. Observe success response
+3. Input: ' AND 1=0--
+4. Observe failure response
+Remediation: Use prepared statements or ORM methods.
+</code></pre>
+
+<hr/>
+
+<h2>📚 References</h2>
+<ul>
+  <li><a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank">OWASP SQLi Reference</a></li>
+  <li><a href="https://portswigger.net/web-security/sql-injection/blind" target="_blank">PortSwigger Blind SQLi Labs</a></li>
+</ul>
+<p>
+  <a href="/blind">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

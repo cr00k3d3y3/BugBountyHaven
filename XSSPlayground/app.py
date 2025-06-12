@@ -34,6 +34,7 @@ def log_attempt(endpoint, ip, payload):
 
 messages = []
 
+
 @app.route('/')
 def xss_home():
     return render_template('index.html')

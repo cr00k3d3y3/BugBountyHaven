@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JWT None Algorithm Abuse Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎭 JWT None Algorithm Abuse</h1>
+
+<h2>🔎 What Is It?</h2>
+<p>JWTs contain a header specifying the algorithm used to sign the token. If a server fails to properly validate this algorithm, it might accept a token with <code>"alg": "none"</code> — effectively disabling signature verification.</p>
+
+<hr/>
+
+<h2>📦 Normal JWT Structure</h2>
+<pre><code>
+Header:  { "alg": "HS256", "typ": "JWT" }
+Payload: { "user": "guest", "role": "user" }
+Signature: HMAC-SHA256(base64url(header) + "." + base64url(payload), secret)
+</code></pre>
+
+<h2>🚨 Malicious JWT With alg: none</h2>
+<pre><code>
+Header:  { "alg": "none", "typ": "JWT" }
+Payload: { "user": "admin", "role": "admin" }
+Signature: (omitted)
+</code></pre>
+
+<p>If the server skips signature validation, this forged token grants admin access without knowing the secret!</p>
+
+<hr/>
+
+<h2>🧪 Exploit Steps</h2>
+<ol>
+  <li>Capture a JWT (e.g., from /jwt_none login).</li>
+  <li>Decode it on <a href="https://jwt.io" target="_blank">jwt.io</a>.</li>
+  <li>Change header to <code>{"alg":"none"}</code>.</li>
+  <li>Change payload to <code>{"user":"admin","role":"admin"}</code>.</li>
+  <li>Remove the signature section (leave two segments).</li>
+  <li>Replace your <code>jwt_none</code> cookie with the new token.</li>
+  <li>Visit <code>/jwt_admin_none</code>.</li>
+</ol>
+
+<hr/>
+
+<h2>❌ Common Misconfigurations</h2>
+<ul>
+  <li>Allowing <code>"none"</code> as a valid algorithm.</li>
+  <li>Not enforcing algorithm validation in JWT libraries.</li>
+  <li>Trusting user-provided JWTs without checking the signature.</li>
+</ul>
+
+<hr/>
+
+<h2>✅ Reporting Example</h2>
+<pre><code>
+Title: JWT Forgery via "none" Algorithm
+Impact: Full admin access without signature verification
+Steps:
+1. Modify JWT header to use "none"
+2. Remove signature
+3. Inject payload with admin role
+4. Gain access to /jwt_admin_none
+Remediation: Disable "none" algorithm at the library level; enforce signing algorithms server-side.
+</code></pre>
+
+<hr/>
+
+<h2>🏁 Flag</h2>
+<pre><code>🎉 FLAG{jwt_none_alg_bypass}</code></pre>
+
+<hr/>
+
+<h2>📚 Resources</h2>
+<ul>
+  <li><a href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/" target="_blank">Auth0 JWT Vulnerability Post</a></li>
+  <li><a href="https://owasp.org/www-project-json-web-token/" target="_blank">OWASP JWT Project</a></li>
+</ul>
+<p>
+  <a href="/home">Challenge Menu</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

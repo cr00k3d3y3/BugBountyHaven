@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time-Based SQLi Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>⏱️ Time-Based Blind SQL Injection</h1>
+
+<h2>🧠 What Is It?</h2>
+<p>Time-based SQLi relies on the application delaying its response if a condition is true. This technique is used when there’s no visible output but you can still measure the effect of injected SQL.</p>
+
+<hr/>
+
+<h2>🛠️ Example Payload</h2>
+<p>Input:</p>
+<pre><code>' OR IF(1=1, SLEEP(5), 0)-- </code></pre>
+<p>If the server takes noticeably longer to respond, the injection worked.</p>
+
+<hr/>
+
+<h2>🧪 Use Case</h2>
+<p>This method is useful for:</p>
+<ul>
+  <li>Extracting data one bit at a time</li>
+  <li>Confirming the existence of certain tables or users</li>
+  <li>Testing blind injection where no error or text is shown</li>
+</ul>
+
+<hr/>
+
+<h2>❌ Incorrect Example</h2>
+<pre><code>' OR 1=1--</code></pre>
+<p>This might bypass login but won't delay the response — not helpful for blind scenarios.</p>
+
+<hr/>
+
+<h2>✅ Working Sequence</h2>
+<pre><code>
+1. Input a payload with SLEEP.
+2. Measure the time it takes to respond.
+3. If delay is observed, injection succeeded.
+</code></pre>
+
+<hr/>
+
+<h2>✅ Flag Trigger</h2>
+<p>The backend intentionally sleeps if “sleep” is in the input.</p>
+<p>Trigger this using:</p>
+<pre><code>admin' OR IF(1=1, SLEEP(5), 0)--</code></pre>
+<p>Once detected, the flag is returned:</p>
+<pre><code>🎉 FLAG{time_based_sqli_detected}</code></pre>
+
+<hr/>
+
+<h2>📝 Reporting Example</h2>
+<pre><code>
+Title: Blind Time-Based SQL Injection in user parameter
+Impact: Enables attacker to extract DB contents via time delays.
+Steps:
+1. POST name='admin' OR IF(1=1, SLEEP(5), 0)--
+2. Observe 5-second delay
+3. Confirm control over query execution path
+Remediation: Parameterized queries, avoid string concatenation.
+</code></pre>
+
+<hr/>
+
+<h2>🔗 References</h2>
+<ul>
+  <li><a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank">OWASP SQLi Reference</a></li>
+  <li><a href="https://portswigger.net/web-security/sql-injection/blind" target="_blank">PortSwigger Blind SQLi Guide</a></li>
+</ul>
+<p>
+  <a href="/time">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

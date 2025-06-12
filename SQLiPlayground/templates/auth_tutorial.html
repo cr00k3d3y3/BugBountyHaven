@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Auth Bypass via SQL Injection</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔐 Authentication Bypass via SQL Injection</h1>
+
+<h2>🧠 What Is It?</h2>
+<p>This vulnerability occurs when a login form fails to properly handle user-supplied input in a SQL query, allowing attackers to bypass authentication altogether.</p>
+
+<hr/>
+
+<h2>🛠️ Server-Side Query Example</h2>
+<pre><code>
+query = "SELECT * FROM users WHERE username = '" + user + "' AND password = '" + pass + "'"
+</code></pre>
+
+<p>If no input sanitization is performed, SQL statements can be tampered with.</p>
+
+<hr/>
+
+<h2>🧪 Example Payloads</h2>
+<h3>1️⃣ Classic Bypass</h3>
+<pre><code>
+Username: ' OR 1=1--
+Password: anything
+</code></pre>
+
+<h3>2️⃣ Targeted Bypass</h3>
+<pre><code>
+Username: admin' --
+Password: 
+</code></pre>
+
+<p>These bypass authentication by forcing the WHERE clause to evaluate as true.</p>
+
+<hr/>
+
+<h2>❌ Common Misconfigurations</h2>
+<ul>
+  <li>Concatenating user input into raw SQL.</li>
+  <li>Omitting prepared statements or parameterized queries.</li>
+  <li>Returning detailed SQL errors to the client.</li>
+</ul>
+
+<hr/>
+
+<h2>✅ Reporting Example</h2>
+<pre><code>
+Title: SQL Injection Enables Authentication Bypass
+Impact: Grants unauthorized access to admin panel
+Steps:
+1. Go to /auth
+2. Enter: username = ' OR 1=1-- 
+3. Observe: Access granted
+Remediation: Use parameterized queries. Sanitize inputs using a whitelist approach.
+</code></pre>
+
+<hr/>
+
+<h2>🏁 Flag</h2>
+<p>If you successfully bypass the login and reach the welcome page, you’ll receive:</p>
+<pre><code>🎉 FLAG{auth_bypass_success}</code></pre>
+
+<hr/>
+
+<h2>📚 References</h2>
+<ul>
+  <li><a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank">OWASP SQLi Guide</a></li>
+  <li><a href="https://portswigger.net/web-security/sql-injection" target="_blank">PortSwigger SQLi Labs</a></li>
+</ul>
+<p>
+  <a href="/auth">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Auth Leak Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔓 Session ID Disclosure (Auth Leak)</h1>
+
+<h2>🧠 What Is It?</h2>
+<p>This vulnerability occurs when a server leaks internal session identifiers based on user enumeration, revealing predictable or sensitive data via output formatting.</p>
+
+<hr/>
+
+<h2>🛠️ Vulnerable Behavior</h2>
+<p>Suppose an endpoint like:</p>
+<pre><code>/leak?user=admin</code></pre>
+<p>Returns:</p>
+<pre><code>SESSIONID=admin_1</code></pre>
+<p>This hints at an ID generation pattern that includes usernames — a dangerous design.</p>
+
+<hr/>
+
+<h2>🔍 How to Exploit</h2>
+<ol>
+  <li>Try known usernames (admin, guest, root).</li>
+  <li>Capture any ID scheme returned.</li>
+  <li>Use discovered session IDs in authentication headers/cookies.</li>
+</ol>
+
+<h3>🧪 Example Requests</h3>
+<pre><code>
+GET /leak?user=admin
+
+Response: SESSIONID=admin_1
+</code></pre>
+
+<pre><code>
+GET /leak?user=guest
+
+Response: SESSIONID=guest_2
+</code></pre>
+
+<p>Try to reuse leaked IDs in privileged endpoints or brute force predictable ones.</p>
+
+<hr/>
+
+<h2>❌ Anti-Patterns</h2>
+<ul>
+  <li>Echoing user IDs or session tokens in a response.</li>
+  <li>Using predictable patterns like <code>username_ID</code>.</li>
+  <li>Not validating access to session generation APIs.</li>
+</ul>
+
+<hr/>
+
+<h2>✅ Reporting Example</h2>
+<pre><code>
+Title: Predictable Session ID Exposure via /leak Endpoint
+Impact: Allows attacker to derive valid session identifiers.
+Steps:
+1. Visit /leak?user=admin
+2. Response leaks SESSIONID
+3. Replay SESSIONID against /admin
+Remediation: Do not return internal tokens to unauthenticated users. Use random UUIDs.
+</code></pre>
+
+<hr/>
+
+<h2>🏁 Flag</h2>
+<p>When a leaked ID is recognized for <code>admin</code> user, the flag is triggered:</p>
+<pre><code>🎉 FLAG{session_hijack}</code></pre>
+
+<hr/>
+
+<h2>📚 References</h2>
+<ul>
+  <li><a href="https://owasp.org/www-community/attacks/Session_fixation" target="_blank">OWASP: Session Fixation</a></li>
+  <li><a href="https://portswigger.net/web-security/authentication" target="_blank">PortSwigger Auth Labs</a></li>
+</ul>
+<p>
+  <a href="/leak">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

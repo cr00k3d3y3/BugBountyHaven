@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JWT Token Tampering Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔐 JWT Token Tampering</h1>
+
+<h2>🧠 What is JWT?</h2>
+<p>JSON Web Tokens (JWTs) are used for securely transmitting information between parties as a JSON object. They are commonly used in authentication systems.</p>
+
+<hr/>
+
+<h2>📦 JWT Structure</h2>
+<pre><code>
+Header:    { "alg": "HS256", "typ": "JWT" }
+Payload:   { "user": "guest", "role": "user" }
+Signature: HMAC-SHA256(base64url(header) + "." + base64url(payload), secret)
+</code></pre>
+
+<hr/>
+
+<h2>🎯 Attack Concept</h2>
+<p>If the application uses a weak or known secret key, an attacker can forge a new token with escalated privileges.</p>
+
+<h3>Example Payload Modification</h3>
+<pre><code>
+{
+  "user": "admin",
+  "role": "admin"
+}
+</code></pre>
+
+<p>Then sign it using a guessed secret like <code>'ultrasecret'</code> with the same algorithm (e.g., HS256).</p>
+
+<hr/>
+
+<h2>🧪 Exploit Steps</h2>
+<ol>
+  <li>Capture token from /jwt_login using browser dev tools or a proxy.</li>
+  <li>Decode it on <a href="https://jwt.io" target="_blank">jwt.io</a>.</li>
+  <li>Change payload to <code>{"user": "admin", "role": "admin"}</code>.</li>
+  <li>Sign with guessed secret (try 'ultrasecret').</li>
+  <li>Replace your browser's cookie named <code>jwt</code> with the new token.</li>
+  <li>Visit /jwt_admin and retrieve the flag.</li>
+</ol>
+
+<hr/>
+
+<h2>❌ Common Mistakes</h2>
+<ul>
+  <li>Assuming JWTs can’t be tampered with.</li>
+  <li>Using weak or guessable secrets (e.g., 'password', 'secret').</li>
+  <li>Trusting tokens without verifying their signature.</li>
+</ul>
+
+<hr/>
+
+<h2>✅ Reporting Example</h2>
+<pre><code>
+Title: JWT Token Tampering via Weak Secret
+Impact: Unauthorized access to admin-level functionality
+Steps:
+1. Get token from /jwt_login
+2. Modify role to "admin"
+3. Sign with 'ultrasecret'
+4. Access /jwt_admin
+Remediation: Use long, unpredictable secrets and enforce strong signing algorithms (e.g., RS256)
+</code></pre>
+
+<hr/>
+
+<h2>🏁 Flag</h2>
+<pre><code>🎉 FLAG{jwt_token_tampering}</code></pre>
+
+<hr/>
+
+<h2>📚 References</h2>
+<ul>
+  <li><a href="https://owasp.org/www-community/vulnerabilities/JSON_Web_Token_(JWT)_Security_Cheat_Sheet" target="_blank">OWASP JWT Security</a></li>
+  <li><a href="https://jwt.io" target="_blank">JWT.IO Debugger</a></li>
+</ul>
+<p>
+  <a href="/home">Challenge Menu</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

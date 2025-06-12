@@ -9,10 +9,16 @@ import base64
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 from jwt import encode as jwt_encode, decode as jwt_decode, algorithms
+from datetime import datetime
+# Add to app.py (email alert config and review logging setup)
+import smtplib
+from email.mime.text import MIMEText
 
 
 
-
+EMAIL_SENDER = 'alert@bbhlab.local'
+EMAIL_RECEIVER = 'ded3y3@proton.me'
+SMTP_SERVER = 'localhost'
 JWT_SECRET = 'wrong-secret'  # intentionally insecure
 JWT_ALGORITHM = 'HS256'
 
@@ -92,6 +98,8 @@ def log_attempt(endpoint, ip, payload):
     db.execute("INSERT INTO logs (endpoint, ip, payload) VALUES (?, ?, ?)", (endpoint, ip, payload))
     db.commit()
 
+
+
 # Routes
 
 @app.route('/home')
@@ -121,6 +129,11 @@ def classic():
         except Exception as e:
             result = f"❌ Error: {e}"
     return render_template('classic.html', result=result, flag=flag, hint=hint)
+
+
+@app.route('/classic_tutorial')
+def classic_tutorial():
+    return render_template('classic_tutorial.html')
 
 @app.route('/union', methods=['GET', 'POST'])
 def union():
@@ -164,16 +177,11 @@ def auth():
             result = "Invalid credentials"
     return render_template('auth.html', result=result)
 
-from datetime import datetime
 
-# Add to app.py (email alert config and review logging setup)
-import smtplib
-from email.mime.text import MIMEText
-from datetime import datetime
+@app.route('/auth_tutorial')
+def auth_tutorial():
+    return render_template('auth_tutorial.html')
 
-EMAIL_SENDER = 'alert@bbhlab.local'
-EMAIL_RECEIVER = 'ded3y3@proton.me'
-SMTP_SERVER = 'localhost'
 
 # Email alert function
 def send_alert(subject, body):
@@ -187,34 +195,6 @@ def send_alert(subject, body):
             server.sendmail(EMAIL_SENDER, EMAIL_RECEIVER, msg.as_string())
     except Exception as e:
         print(f"[!] Failed to send email: {e}")
-
-@app.route('/moderate', methods=['GET', 'POST'])
-def moderate():
-    if request.cookies.get('role') != 'admin':
-        return "Access Denied"
-
-    db = get_db()
-    cur = db.cursor()
-
-    if request.method == 'POST':
-        comment_id = request.form.get('id')
-        action = request.form.get('action')
-        mod = request.cookies.get('auth') or 'admin'
-        new_status = 'approved' if action == 'approve' else 'flagged'
-        cur.execute("UPDATE feedback SET status = ?, moderated_by = ? WHERE id = ?", (new_status, mod, comment_id))
-        db.commit()
-
-    cur.execute("SELECT id, comment, status, moderated_by FROM feedback ORDER BY id DESC")
-    comments = cur.fetchall()
-    return render_template("moderate.html", comments=comments)
-
-
-@app.route('/reviewlog')
-def review_log():
-    cur = get_db().cursor()
-    cur.execute("SELECT id, endpoint, ip, payload, timestamp FROM logs WHERE endpoint='/moderate' ORDER BY timestamp DESC")
-    entries = cur.fetchall()
-    return render_template('reviewlog.html', entries=entries)
 
 
 
@@ -317,33 +297,17 @@ def leak():
             result = f"❌ Error: {e}"
     return render_template('leak.html', result=result, hint=hint, flag=flag)
 
+
+@app.route('/leak_tutorial')
+def leak_tutorial():
+    return render_template('leak_tutorial.html')
+
+
 @app.route('/admin')
 def admin():
     if request.cookies.get('role') == 'admin':
         return render_template('flag.html', flag='FLAG{admin_area_access}')
     return "Access Denied"
-
-@app.route('/campaign')
-def campaign():
-    cur = get_db().cursor()
-    cur.execute("SELECT * FROM challenges")
-    challenges = cur.fetchall()
-
-    username = request.cookies.get('auth') or 'anonymous'
-    cur.execute("SELECT flag_value, stars FROM submissions WHERE username = ?", (username,))
-    found = {row[0].strip(): row[1] for row in cur.fetchall()}
-
-    progress = []
-    for ch in challenges:
-        flag_value = ch[4].strip()  # Ensure no invisible characters
-        print("Found flags:", found.keys())
-        print("Challenge flag:", repr(flag_value))
-
-        stars = found.get(flag_value, 0)
-        status = '✅ Solved' if stars else '❌ Unsolved'
-        progress.append((ch[1], ch[2], ch[3], status, ch[5], stars))
-
-    return render_template("campaign.html", progress=progress)
 
 
 
@@ -364,6 +328,10 @@ def blind():
             result = "❌ Query Error"
     return render_template('blind.html', result=result, hint=hint)
 
+@app.route('/blind_tutorial')
+def blind_tutorial():
+    return render_template('blind_tutorial.html')
+
 @app.route('/time', methods=['GET', 'POST'])
 def time_based():
     result = ''
@@ -377,6 +345,12 @@ def time_based():
         else:
             result = f"Processed input: {name}"
     return render_template('time.html', result=result, hint=hint)
+
+
+@app.route('/time_tutorial')
+def time_tutorial():
+    return render_template('time_tutorial.html')
+
 
 @app.route('/stacked', methods=['GET', 'POST'])
 def stacked():
@@ -405,6 +379,10 @@ def stacked():
     return render_template('stacked.html', result=results, hint=hint, flag=flag)
 
 
+@app.route('/stacked_tutorial')
+def stacked_tutorial():
+    return render_template('stacked_tutorial.html')
+
 @app.route('/robots.txt')
 def robots():
     return (
@@ -417,6 +395,10 @@ def robots():
         200,
         {'Content-Type': 'text/plain'}
     )
+
+@app.route('/robots_tutorial')
+def robots_tutorial():
+    return render_template('robots_tutorial.html')
 
 @app.route('/secret_dashboard')
 def secret_dashboard():
@@ -555,6 +537,12 @@ def jwt_admin():
     except Exception as e:
         return f"❌ Invalid token: {str(e)}"
 
+
+@app.route('/jwt_token_tamp_tutorial')
+def jwt_token_tamp_tutorial():
+    return render_template('jwt_token_tamp_tutorial.html')
+
+
 # JWT None Algorithm Injection
 @app.route('/jwt_none', methods=['GET', 'POST'])
 def jwt_none():
@@ -566,6 +554,9 @@ def jwt_none():
         return resp
     return render_template('jwt_none.html')
 
+@app.route('/jwt_none_tutorial')
+def jwt_none_tutorial():
+    return render_template('jwt_none_tutorial.html')
 
 @app.route('/jwt_admin_none')
 def jwt_admin_none():
@@ -602,7 +593,6 @@ def jwt_rs_admin():
     token = request.cookies.get('jwt')
     if not token:
         return "❌ Missing token"
-
     try:
         decoded = jwt.decode(token, PUBLIC_KEY_PEM, algorithms=["RS256", "HS256"])
         if decoded.get("role") == "admin":
@@ -619,7 +609,10 @@ def jwt_rs_admin():
         return "❌ Not admin"
     except Exception as e:
         return f"❌ Invalid token: {e}"
-    
+
+@app.route('/jwt_confusion_tutorial')
+def jwt_confusion_tutorial():
+    return render_template('jwt_confusion_tutorial.html')
 
 @app.route('/jwt_key')
 def jwt_key_disclosure():

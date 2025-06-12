@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stacked Query SQLi Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>💥 Stacked Query SQL Injection</h1>
+
+<h2>🧠 What Is It?</h2>
+<p>Stacked queries occur when an attacker injects multiple SQL statements separated by a semicolon <code>;</code> into a vulnerable input field.</p>
+<p>If the backend allows multiple queries per call, this can allow powerful manipulation such as changing roles or inserting data.</p>
+
+<hr/>
+
+<h2>🛠️ Example Input</h2>
+<p>Target Input:</p>
+<pre><code>guest'; UPDATE users SET role='admin' WHERE username='guest';--</code></pre>
+
+<p>This query terminates the first statement and adds a second that escalates privileges.</p>
+
+<hr/>
+
+<h2>💡 How It Works</h2>
+<ol>
+  <li>The user input is injected into a query like:</li>
+</ol>
+<pre><code>SELECT * FROM users WHERE username = 'INPUT';</code></pre>
+
+<p>If <code>INPUT</code> is a stacked payload, it executes:</p>
+<pre><code>SELECT * FROM users WHERE username = 'guest';
+UPDATE users SET role='admin' WHERE username='guest';</code></pre>
+
+<p>This changes the user's role in the database.</p>
+
+<hr/>
+
+<h2>❌ Common Mistake</h2>
+<pre><code>guest' OR 1=1--</code></pre>
+<p>This is a basic injection, not a stacked query. It won’t demonstrate the power of multiple statements.</p>
+
+<hr/>
+
+<h2>✅ Flag Trigger</h2>
+<p>After elevating privileges, navigate to a protected page such as <code>/admin</code> while logged in as guest.</p>
+<p>The application will reveal:</p>
+<pre><code>🎉 FLAG{stacked_query_executed}</code></pre>
+
+<hr/>
+
+<h2>📝 Reporting Example</h2>
+<pre><code>
+Title: Stacked Query SQL Injection allows privilege escalation
+Impact: Attacker can elevate role to 'admin' by chaining multiple queries.
+Steps to Reproduce:
+1. Submit input: guest'; UPDATE users SET role='admin' WHERE username='guest';--
+2. Access /admin route.
+3. Admin access granted, flag revealed.
+Remediation: Use parameterized queries and disable multiple statements per query.
+</code></pre>
+
+<hr/>
+
+<h2>🔗 References</h2>
+<ul>
+  <li><a href="https://owasp.org/www-community/attacks/SQL_Injection" target="_blank">OWASP SQLi Guide</a></li>
+  <li><a href="https://portswigger.net/web-security/sql-injection" target="_blank">PortSwigger SQLi Labs</a></li>
+</ul>
+<p>
+  <a href="/stacked">Back to Challenge</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

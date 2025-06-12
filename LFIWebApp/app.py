@@ -43,6 +43,8 @@ def log_attempt(endpoint, ip, payload):
     db.execute("INSERT INTO logs (endpoint, ip, payload) VALUES (?, ?, ?)", (endpoint, ip, payload))
     db.commit()
 
+
+
 # Routes
 
 @app.route('/', methods=['GET', 'POST'])

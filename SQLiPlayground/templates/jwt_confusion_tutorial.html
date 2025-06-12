@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JWT RS256 to HS256 Key Confusion</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔐 JWT Key Confusion: RS256 to HS256 Abuse</h1>
+
+<h2>🧠 What Is It?</h2>
+<p>This attack exploits a JWT implementation flaw where the server accepts both RS256 (asymmetric) and HS256 (symmetric) algorithms. If an attacker knows the public key used for RS256 verification, they can abuse it as an HMAC secret for HS256 to forge tokens.</p>
+
+<hr/>
+
+<h2>⚔️ The Confusion</h2>
+<p><strong>RS256</strong> = Uses private key to sign and public key to verify.</p>
+<p><strong>HS256</strong> = Uses a shared secret key for both signing and verifying.</p>
+
+<p>If the backend is misconfigured to accept <em>either</em> and misuses the public key (intended only for verification) as a secret key for HMAC, it enables signature forgery.</p>
+
+<hr/>
+
+<h2>🛠️ Exploit Process</h2>
+<ol>
+  <li>Obtain the server’s RS256 <code>public.pem</code>.</li>
+  <li>Create a JWT with <code>"alg":"HS256"</code> and a payload like:
+    <pre><code>{ "user": "admin", "role": "admin" }</code></pre>
+  </li>
+  <li>Sign the JWT using HS256 and the RS256 public key as the secret.</li>
+  <li>Send the forged token as a cookie or Authorization header.</li>
+  <li>If the server mistakenly accepts it, access is granted!</li>
+</ol>
+
+<hr/>
+
+<h2>🔐 Secure vs. Insecure Comparison</h2>
+<ul>
+  <li><strong>Secure:</strong> Server restricts JWT alg to RS256 and uses correct keys.</li>
+  <li><strong>Insecure:</strong> Server accepts HS256 and uses public.pem as the secret.</li>
+</ul>
+
+<hr/>
+
+<h2>✅ Reporting Example</h2>
+<pre><code>
+Title: JWT Key Confusion (RS256 to HS256)
+Impact: Full privilege escalation to admin
+Steps:
+1. Fetch public key via /.well-known or /jwt_key
+2. Use it to HMAC-sign a token as HS256
+3. Set token in Authorization or cookie
+4. Gain access to /jwt_admin_key
+Remediation: Lock JWT algorithm to RS256; validate alg field manually.
+</code></pre>
+
+<hr/>
+
+<h2>🏁 Flag</h2>
+<pre><code>🎯 FLAG{jwt_rs256_hs256_confusion}</code></pre>
+
+<hr/>
+
+<h2>📚 References</h2>
+<ul>
+  <li><a href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/" target="_blank">Auth0: JWT Algorithm Confusion</a></li>
+  <li><a href="https://portswigger.net/web-security/jwt" target="_blank">PortSwigger: JWT Attacks</a></li>
+</ul>
+<a href="/home">Challenge Menu</a> |
+<a href="/submit_flag">Submit Flag</a>
+</body>
+</html>

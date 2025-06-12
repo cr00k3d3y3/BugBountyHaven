@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>robots.txt Disallowed Path Discovery</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      color: #0ff;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 2em 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🤖 robots.txt Discovery and Enumeration</h1>
+
+<h2>🧠 What Is robots.txt?</h2>
+<p>A <code>robots.txt</code> file is used to instruct web crawlers (like Googlebot) what parts of a site to avoid indexing. It's located at the root of a domain (e.g., <code>/robots.txt</code>).</p>
+
+<hr/>
+
+<h2>🔎 Why It Matters to Bug Hunters</h2>
+<ul>
+  <li>May reveal hidden or sensitive paths unintentionally.</li>
+  <li>Not enforced by browsers—only advisory for bots.</li>
+  <li>Paths like <code>/admin</code>, <code>/debug</code>, <code>/backup.zip</code> often appear.</li>
+  <li>These paths may be accessible despite the disallow directive.</li>
+</ul>
+
+<hr/>
+
+<h2>📁 Example Content</h2>
+<pre><code>User-agent: *
+Disallow: /admin/
+Disallow: /backup.zip
+Disallow: /debug.php
+Disallow: /admin/config.php
+</code></pre>
+
+<hr/>
+
+<h2>🧨 Exploitation Process</h2>
+<ol>
+  <li>Navigate to <code>/robots.txt</code> manually or using a recon tool.</li>
+  <li>Review each <code>Disallow</code> entry.</li>
+  <li>Visit the disallowed paths directly (e.g., <code>/admin</code>).</li>
+  <li>Check for file exposures or login panels.</li>
+</ol>
+
+<hr/>
+
+<h2>✅ Reporting Example</h2>
+<pre><code>
+Title: Exposed Sensitive Paths in robots.txt
+Impact: Reveals admin and debug endpoints not meant for public access.
+Steps:
+1. Visit /robots.txt
+2. Note entries: /admin/config.php, /debug.php, etc.
+3. Visit each path and verify exposure
+Remediation: Remove sensitive entries or block access with authentication.
+</code></pre>
+
+<hr/>
+
+<h2>🏁 Flag</h2>
+<pre><code>🎯 FLAG{found_disallowed_path}</code></pre>
+
+<hr/>
+
+<h2>📚 References</h2>
+<ul>
+  <li><a href="https://developer.mozilla.org/en-US/docs/Web/robots.txt" target="_blank">MDN: robots.txt Guide</a></li>
+  <li><a href="https://owasp.org/www-community/attacks/Directory_traversal" target="_blank">OWASP: Directory and File Disclosure</a></li>
+</ul>
+<p>
+  <a href="/home">Challenge Menu</a> |
+  <a href="/submit_flag">Submit Flag</a>
+</p>
+</body>
+</html>

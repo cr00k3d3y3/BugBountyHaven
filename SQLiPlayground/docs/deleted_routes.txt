@@ -1,0 +1,44 @@
+@app.route('/campaign')
+def campaign():
+    cur = get_db().cursor()
+    cur.execute("SELECT * FROM challenges")
+    challenges = cur.fetchall()
+
+    username = request.cookies.get('auth') or 'anonymous'
+    cur.execute("SELECT flag_value, stars FROM submissions WHERE username = ?", (username,))
+    found = {row[0].strip(): row[1] for row in cur.fetchall()}
+
+    progress = []
+    for ch in challenges:
+        flag_value = ch[4].strip()  # Ensure no invisible characters
+        print("Found flags:", found.keys())
+        print("Challenge flag:", repr(flag_value))
+
+        stars = found.get(flag_value, 0)
+        status = '✅ Solved' if stars else '❌ Unsolved'
+        progress.append((ch[1], ch[2], ch[3], status, ch[5], stars))
+
+    return render_template("campaign.html", progress=progress)
+
+
+
+
+    @app.route('/moderate', methods=['GET', 'POST'])
+#def moderate():
+ #   if request.cookies.get('role') != 'admin':
+ #       return "Access Denied"
+ #
+ #   db = get_db()
+ #   cur = db.cursor()
+ #
+ #   if request.method == 'POST':
+ #       comment_id = request.form.get('id')
+ #       action = request.form.get('action')
+ #       mod = request.cookies.get('auth') or 'admin'
+ #       new_status = 'approved' if action == 'approve' else 'flagged'
+ #       cur.execute("UPDATE feedback SET status = ?, moderated_by = ? WHERE id = ?", (new_status, mod, comment_id))
+ #       db.commit()
+
+    cur.execute("SELECT id, comment, status, moderated_by FROM feedback ORDER BY id DESC")
+    comments = cur.fetchall()
+    return render_template("moderate.html", comments=comments)
