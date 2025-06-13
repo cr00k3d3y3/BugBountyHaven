@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GraphQL Broken Access Control</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      padding: 1em;
+      border-left: 4px solid #0ff;
+      overflow-x: auto;
+    }
+    a {
+      color: #0ff;
+      text-decoration: underline;
+    }
+    .btns {
+      margin-top: 2rem;
+    }
+    .btns a {
+      display: inline-block;
+      background: #222;
+      color: #0ff;
+      padding: 0.6rem 1.2rem;
+      margin-right: 1rem;
+      border: 1px solid #0ff;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .btns a:hover {
+      background: #0ff;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔐 Broken Access Control (GraphQL)</h1>
+  <p>
+    Broken Access Control occurs when users are able to access resources or data they shouldn't be authorized to see. In GraphQL, this often happens when:
+  </p>
+  <ul>
+    <li>Authorization checks are missing or only implemented on the client.</li>
+    <li>Data models expose sensitive fields unintentionally.</li>
+    <li>Developers assume GraphQL introspection or field resolution is "secure by default."</li>
+  </ul>
+
+  <h2>🚩 Scenario: Role-Based Leakage</h2>
+  <p>
+    Your GraphQL endpoint exposes a query like this:
+  </p>
+  <pre><code>{
+  allUsers {
+    id
+    username
+    email
+    role
+  }
+}</code></pre>
+
+  <p>But regular users should not be able to see <code>email</code> or <code>role</code>.</p>
+
+  <h2>🧪 Try It Yourself</h2>
+  <p>
+    Use GraphiQL or <code>curl</code> to send this query:
+  </p>
+  <pre><code>curl -X POST http://localhost:8084/graphql \
+  -H "Content-Type: application/json" \
+  --data '{"query":"{ allUsers { id username email role } }"}'</code></pre>
+
+  <p>Observe the results. Do you see sensitive info while logged in as <code>guest</code>?</p>
+
+  <h2>✅ Goal</h2>
+  <p>
+    Find a way to bypass access control and reveal admin-only fields. When successful, you’ll trigger:
+  </p>
+  <pre><code>🎉 FLAG{graphql_access_control_broken}</code></pre>
+
+  <h2>🛠️ Reporting Sample</h2>
+  <pre><code>Title: Broken Access Control in GraphQL Query
+Impact: Unauthorized users can access sensitive fields like 'email' and 'role'.
+Steps:
+  1. Visit /graphql
+  2. Send query: { allUsers { id username email role } }
+  3. Observe unauthorized data exposure
+Remediation: Enforce server-side access checks based on authenticated user role.
+  </code></pre>
+
+  <div class="btns">
+    <a href="/graphql">🧪 Go to GraphQL IDE</a>
+    <a href="/submit_flag">🚩 Submit Flag</a>
+    <a href="/">⬅️ Home</a>
+  </div>
+
+</body>
+</html>

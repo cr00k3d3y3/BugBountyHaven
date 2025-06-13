@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   sqli_playground:
@@ -27,6 +27,15 @@ services:
       - ./LFIWebApp:/app
     restart: unless-stopped
     container_name: lfi_webapp
+
+  graphql_playground:
+    build: ./GraphQLPlayground
+    ports:
+      - "8084:80"
+    volumes:
+      - ./GraphQLPlayground:/app
+    restart: unless-stopped
+    container_name: graphql_playground
 
   landing:
     image: nginx:alpine

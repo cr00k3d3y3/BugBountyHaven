@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GraphQL Endpoint Discovery Tutorial</title>
+  <style>
+    body {
+      background: #111;
+      color: #eee;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #0ff;
+    }
+    pre {
+      background: #222;
+      color: #0f0;
+      padding: 1rem;
+      border: 1px solid #0ff;
+      border-radius: 8px;
+      overflow-x: auto;
+      text-align: left;
+    }
+    code {
+      color: #0ff;
+    }
+    .btn {
+      background: #222;
+      color: #0ff;
+      border: 1px solid #0ff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      margin: 1rem;
+      display: inline-block;
+    }
+    .btn:hover {
+      background: #0ff;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔍 GraphQL Endpoint Discovery</h1>
+<p>GraphQL doesn't use static REST endpoints like <code>/api/users</code>. Instead, it exposes a single dynamic endpoint (commonly <code>/graphql</code>). This makes it stealthier, but still discoverable.</p>
+
+<h2>🛠 Tools to Discover GraphQL Endpoints</h2>
+<p>You can use fuzzers or direct introspection queries to discover a GraphQL endpoint and confirm its functionality.</p>
+
+<h3>✅ Using <code>curl</code> (Be precise!)</h3>
+<pre><code>curl -X POST http://localhost:8084/graphql \
+  -H "Content-Type: application/json" \
+  -d "{\"query\":\"{ __schema { types { name } } }\"}"</code></pre>
+
+<h3>✅ Using <code>httpie</code> (easier syntax)</h3>
+<pre><code>http POST http://localhost:8084/graphql query='{ __schema { types { name } } }'</code></pre>
+
+<h3>✅ Using Burp Suite Repeater</h3>
+<pre><code>POST /graphql HTTP/1.1
+Host: localhost:8084
+Content-Type: application/json
+
+{
+  "query": "{ __schema { types { name } } }"
+}</code></pre>
+
+<h2>🎯 Expected Behavior</h2>
+<p>If GraphQL is enabled and introspection is allowed, the server will return all types in the schema. This confirms the endpoint is live and vulnerable to enumeration.</p>
+
+<h2>🕵️ Submit Flag</h2>
+<p>If successful, the app will drop:</p>
+<pre><code>🎉 FLAG{graphql_introspection_enabled}</code></pre>
+
+  <div class="btns">
+    <a href="/graphql">🧪 Go to GraphQL IDE</a>
+    <a href="/submit_flag">🚩 Submit Flag</a>
+    <a href="/">⬅️ Home</a>
+  </div>
+
+</body>
+</html>
